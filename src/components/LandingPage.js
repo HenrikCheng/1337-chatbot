@@ -1,16 +1,38 @@
 import React, { useState } from "react";
+import { Configuration, OpenAIApi } from "openai";
 
 const LandingPage = () => {
-  const [inputValue, setInputValue] = useState("");
+  const configuration = new Configuration({
+    apiKey: process.env.REACT_APP_API_KEY,
+  });
+
+  const openai = new OpenAIApi(configuration);
+  const [prompt, setPrompt] = useState("");
+  const [apiResponse, setApiResponse] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
-    setInputValue(e.target.value);
+    setPrompt(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Do something with the input value, such as sending it to a server
-    console.log("Submitted value:", inputValue);
+    console.log("Submitted value:", prompt);
+    setLoading(true);
+    try {
+      const result = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: prompt,
+        temperature: 0.5,
+        max_tokens: 4000,
+      });
+      console.log("response", result.data.choices[0].text);
+      setApiResponse(result.data.choices[0].text);
+    } catch (e) {
+      console.log(e);
+      setApiResponse("Something is going wrong, Please try again.");
+    }
+    setLoading(false);
   };
 
   return (
@@ -20,7 +42,7 @@ const LandingPage = () => {
         <textarea
           rows={6}
           cols={60}
-          value={inputValue}
+          value={prompt}
           onChange={handleInputChange}
           placeholder="Enter your message"
           className="px-4 py-2 border border-gray-300 rounded-md mb-4"
@@ -29,9 +51,15 @@ const LandingPage = () => {
           type="submit"
           className="px-4 py-2 bg-blue-500 text-white rounded-md"
         >
-          Submit
+          {loading ? "Generating..." : "Generate"}
         </button>
       </form>
+      {apiResponse && (
+        <div className="mx-20 mt-20">
+          <strong>API response:</strong>
+          {apiResponse}
+        </div>
+      )}
     </div>
   );
 };
