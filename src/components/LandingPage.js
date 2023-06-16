@@ -17,21 +17,27 @@ const LandingPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted value:", prompt);
     setLoading(true);
+
     try {
+      // Fetch the content of the text file
+      const response = await fetch("./handbook.txt");
+      //   const handbookContent = await response.text();
+
       const result = await openai.createCompletion({
         model: "text-davinci-003",
+        // prompt: `${prompt}\n\n${handbookContent}`,
         prompt: prompt,
         temperature: 0.5,
         max_tokens: 4000,
       });
-      console.log("response", result.data.choices[0].text);
+
       setApiResponse(result.data.choices[0].text);
     } catch (e) {
       console.log(e);
-      setApiResponse("Something is going wrong, Please try again.");
+      setApiResponse("Something is going wrong. Please try again.");
     }
+
     setLoading(false);
   };
 
