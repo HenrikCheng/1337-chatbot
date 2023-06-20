@@ -60,9 +60,6 @@ const LandingPage = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <h1 className="mb-6 text-5xl font-bold">Recept-generatorn</h1>
       <form onSubmit={handleSubmit} className="flex flex-col items-center">
-        {/* <h3 className="mb-8 text-3xl font-bold">
-          Skriv ned de matvaror du vill använda, separera dessa med ", "
-        </h3> */}
         <div className="grid grid-cols-2 gap-4">
           {ingredients.map((ingredient, index) => (
             <div key={index} className="flex items-center mb-4">
@@ -76,7 +73,7 @@ const LandingPage = () => {
                   onClick={() => handleRemoveIngredient(index)}
                   className="ml-2 px-2 py-1 bg-red-500 text-white rounded-md"
                 >
-                  Remove
+                  Ta bort
                 </button>
               )}
             </div>
