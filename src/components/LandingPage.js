@@ -61,7 +61,7 @@ const LandingPage = () => {
       <h1 className="mb-6 text-5xl font-bold">Recept-generatorn</h1>
       <form onSubmit={handleSubmit} className="flex flex-col items-center">
         <h3 className="mb-8 text-3xl font-bold">
-          Skriv ned de matvaror du har över i kylen
+          Skriv ned de matvaror du vill tillaga
         </h3>
         <div className="grid grid-cols-2 gap-4">
           {ingredients.map((ingredient, index) => (
