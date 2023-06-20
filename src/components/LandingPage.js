@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Configuration, OpenAIApi } from "openai";
+import IngridientInput from "./IngridientInput";
 
 const LandingPage = () => {
   const configuration = new Configuration({
@@ -8,11 +9,30 @@ const LandingPage = () => {
 
   const openai = new OpenAIApi(configuration);
   const [prompt, setPrompt] = useState("");
+  const [ingredients, setIngredients] = useState([""]); // Initial ingredient input
   const [apiResponse, setApiResponse] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (e) => {
-    setPrompt(e.target.value);
+  useEffect(() => {
+    const ingredientsString = ingredients.join(", ");
+    setPrompt(ingredientsString);
+  }, [ingredients]);
+
+  const handleIngredientChange = (index, value) => {
+    const updatedIngredients = [...ingredients];
+    updatedIngredients[index] = value;
+    setIngredients(updatedIngredients);
+  };
+
+  const handleAddIngredient = () => {
+    setIngredients([...ingredients, ""]);
+  };
+
+  const handleRemoveIngredient = (index) => {
+    if (index === 0) return; // Prevent removing the first ingredient
+    const updatedIngredients = [...ingredients];
+    updatedIngredients.splice(index, 1);
+    setIngredients(updatedIngredients);
   };
 
   const handleSubmit = async (e) => {
@@ -20,14 +40,9 @@ const LandingPage = () => {
     setLoading(true);
 
     try {
-      // Fetch the content of the text file
-      const response = await fetch("./handbook.txt");
-      //   const handbookContent = await response.text();
-
       const result = await openai.createCompletion({
         model: "text-davinci-003",
-        // prompt: `${prompt}\n\n${handbookContent}`,
-        prompt: prompt,
+        prompt: `{Ge mig ett recept, använd följande ingridienser: ${prompt}. Inled med namnet på rätten.}`,
         temperature: 0.5,
         max_tokens: 4000,
       });
@@ -43,26 +58,50 @@ const LandingPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6">Ask a question about 1337</h1>
+      <h1 className="mb-6 text-5xl font-bold">Recept-generatorn</h1>
       <form onSubmit={handleSubmit} className="flex flex-col items-center">
-        <textarea
-          rows={6}
-          cols={60}
-          value={prompt}
-          onChange={handleInputChange}
-          placeholder="Enter your message"
-          className="px-4 py-2 border border-gray-300 rounded-md mb-4"
-        />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded-md"
-        >
-          {loading ? "Generating..." : "Generate"}
-        </button>
+        {/* <h3 className="mb-8 text-3xl font-bold">
+          Skriv ned de matvaror du vill använda, separera dessa med ", "
+        </h3> */}
+        <div className="grid grid-cols-2 gap-4">
+          {ingredients.map((ingredient, index) => (
+            <div key={index} className="flex items-center mb-4">
+              <IngridientInput
+                value={ingredient}
+                onChange={(e) => handleIngredientChange(index, e.target.value)}
+              />
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveIngredient(index)}
+                  className="ml-2 px-2 py-1 bg-red-500 text-white rounded-md"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-row space-x-8">
+          <button
+            type="button"
+            onClick={handleAddIngredient}
+            className="ml-2 px-2 py-1 bg-blue-500 text-white rounded-md"
+          >
+            Ny ingridiens
+          </button>
+
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md"
+          >
+            {loading ? "Tar fram recept..." : "Ge mig recept"}
+          </button>
+        </div>
       </form>
       {apiResponse && (
         <div className="mx-20 mt-20">
-          <strong>API response:</strong>
+          <strong>Receptförslag:</strong>
           {apiResponse}
         </div>
       )}
