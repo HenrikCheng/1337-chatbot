@@ -42,7 +42,7 @@ const LandingPage = () => {
     try {
       const result = await openai.createCompletion({
         model: "text-davinci-003",
-        prompt: `{Ge mig ett recept, använd följande ingridienser: ${prompt}. Inled med namnet på rätten, skriv sen recept i punktform.}`,
+        prompt: `{Ge mig ett recept, använd följande ingridienser: ${prompt}. Inled med namnet på rätten, sedan lista ingridienserna, skriv sen receptet i punktform.}`,
         temperature: 0.5,
         max_tokens: 4000,
       });
