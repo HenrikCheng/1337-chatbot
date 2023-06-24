@@ -25,6 +25,7 @@ const LandingPage = () => {
   };
 
   const handleAddIngredient = () => {
+    if (ingredients.length >= 6) return null; // Maximum of 6 ingredients
     setIngredients([...ingredients, ""]);
   };
 
@@ -85,15 +86,20 @@ const LandingPage = () => {
         <div className="flex flex-row space-x-8">
           <button
             type="button"
+            disabled={ingredients && ingredients.length >= 6}
             onClick={handleAddIngredient}
-            className="ml-2 px-2 py-1 bg-blue-500 text-white rounded-md"
+            className={`ml-2 px-2 py-1 rounded-md ${
+              ingredients && ingredients.length >= 6
+                ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                : "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+            }`}
           >
             Ny ingridiens
           </button>
 
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-md"
+            className="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 cursor-pointer rounded-md"
           >
             {loading ? "Tar fram recept..." : "Ge mig recept"}
           </button>
